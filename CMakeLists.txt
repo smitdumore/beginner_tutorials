@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.8)
 project(cpp_pubsub)
 
+# Default to C++14
+if(NOT CMAKE_CXX_STANDARD)
+  set(CMAKE_CXX_STANDARD 14)
+endif()
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
@@ -9,17 +13,44 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
+find_package(example_interfaces REQUIRED)
+
+# set(srv_files
+#   "srv/Modify.srv"
+# )
+
+# rosidl_generate_interfaces(${PROJECT_NAME}
+#   ${srv_files}
+#   DEPENDENCIES builtin_interfaces std_msgs
+#   ADD_LINTER_TESTS
+# )
+
+#rosidl_get_typesupport_target(cpp_typesupport_target "${PROJECT_NAME}" "rosidl_typesupport_cpp")
+
+#add_executable(talker src/publisher_member_function.cpp)
+#ament_target_dependencies(talker rclcpp std_msgs)
+
+#add_executable(listener src/subscriber_member_function.cpp)
+#ament_target_dependencies(listener rclcpp std_msgs)
+
+add_executable(service src/service.cpp)
+ament_target_dependencies(service rclcpp std_msgs example_interfaces)
 
 add_executable(talker src/publisher_member_function.cpp)
-ament_target_dependencies(talker rclcpp std_msgs)
+ament_target_dependencies(talker rclcpp std_msgs example_interfaces)
 
 add_executable(listener src/subscriber_member_function.cpp)
 ament_target_dependencies(listener rclcpp std_msgs)
 
+
+
 install(TARGETS
   talker
   listener
+  service
   DESTINATION lib/${PROJECT_NAME})
+
+
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -33,4 +64,5 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
+#ament_export_dependencies(rosidl_default_runtime)
 ament_package()
