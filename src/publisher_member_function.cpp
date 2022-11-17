@@ -64,6 +64,8 @@ public:
     // initialize publisher
     publisher_ = this->create_publisher<std_msgs::msg::String>("topic", 10);
 
+    frequency = this->get_parameter("hz").get_parameter_value().get<std::float_t>();
+
     // initialize timer callback
     timer_ = this->create_wall_timer(
         500ms, std::bind(&MinimalPublisher::timer_callback, this));
@@ -83,7 +85,7 @@ private:
   void timer_callback() {
     auto message = std_msgs::msg::String();
     message.data = std::to_string(sum_);
-    RCLCPP_WARN_STREAM(this->get_logger(), "Publishing: " << message.data);
+    RCLCPP_WARN_STREAM(this->get_logger(), "Publishing: " << message.data << "with frequency " << frequency);
     publisher_->publish(message);
   }
 
@@ -111,6 +113,7 @@ private:
   rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_;
   rclcpp::Service<example_interfaces::srv::AddTwoInts>::SharedPtr service_;
   size_t sum;
+  float frequency;
 };
 
 int main(int argc, char * argv[]) {
