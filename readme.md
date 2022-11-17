@@ -70,3 +70,12 @@ colcon build --packages-select beginner_tutorials
  . install/setup.bash
  ros2 launch beginner_tutorials pubsub.launch.yaml hz:=20.0
  ```
+
+ ## Steps to call service manually
+ In a new terminal type
+ ```
+ ros2 service call /add_two_ints example_interfaces/srv/AddTwoInts a:\ 10
+ b:\ 10 
+ ```
+
+ 
