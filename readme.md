@@ -5,7 +5,11 @@
 ---
 
 ### Description
- This repository contains a simple publisher and subscriber node
+ This repository contains a simple publisher and subscriber node and ros client-server
+
+ This repo uses a service call to edit a string that is being advertised by a publisher.
+
+ This repo uses ROS inbuilt service file AddTwoInts.srv 
 
 
 ### Dependencies
@@ -45,3 +49,33 @@ colcon build --packages-select beginner_tutorials
  . install/setup.bash
  ros2 run beginner_tutorials listener
  ```
+
+ ## Steps to run service node
+
+ In a new terminal type
+ ```
+ cd <your_ros2_ws>
+ . install/setup.bash
+ ros2 run beginner_tutorials service <arg1> <arg2>
+ ```
+ note: arg1 and arg2 are integer values
+
+ This will change the default sum value from zero to arg1 + arg2 and thus the publishing message will also reflect this change.
+ 
+ ## Steps to launch both nodes
+
+ In a new terminal type
+ ```
+ cd <ROS2_ws>/
+ . install/setup.bash
+ ros2 launch beginner_tutorials pubsub.launch.yaml hz:=20.0
+ ```
+
+ ## Steps to call service manually
+ In a new terminal type
+ ```
+ ros2 service call /add_two_ints example_interfaces/srv/AddTwoInts a:\ 10
+ b:\ 10 
+ ```
+
+ 

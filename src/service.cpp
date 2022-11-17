@@ -25,55 +25,59 @@
  * POSSIBILITY OF SUCH DAMAGE.
  ********************************************************************/
 /**
- *  @file    subscriber_member_function.cpp
+ *  @file    service.cpp
  *  @author  Smit Dumore
  *  @date    11/16/2022
  *  @version 2.0
  *
- *  @brief This file implements a ROS2 subscriber 
+ *  @brief This file implements a ROS2 client 
  *
  */
-
-#include <functional>
+#include <chrono>
+#include <cstdlib>
 #include <memory>
 
 #include "rclcpp/rclcpp.hpp"
-#include "std_msgs/msg/string.hpp"
+#include "example_interfaces/srv/add_two_ints.hpp"
 
-using std::placeholders::_1;
+using namespace std::chrono_literals;
 
-/**
- * @brief Minimal Subscriber Class to handle ros subscriber
- * 
- */
-class MinimalSubscriber : public rclcpp::Node {
- public:
-  /**
-   * @brief Constructor
-  */
-  MinimalSubscriber()
-  : Node("minimal_subscriber") {
-
-    // subscriber initialised
-    subscription_ = this->create_subscription<std_msgs::msg::String>(
-        "topic", 10, std::bind(&MinimalSubscriber::topic_callback, this, _1));
-  }
-
- private:
-  /**
-   * @brief Subscriber callback
-  */
-  void topic_callback(const std_msgs::msg::String & msg) const {
-    RCLCPP_INFO(this->get_logger(), "I heard: '%s'", msg.data.c_str());
-  }
-
-  // subscriber initialised
-  rclcpp::Subscription<std_msgs::msg::String>::SharedPtr subscription_;
-};
-
-int main(int argc, char * argv[]) {
+int main(int argc, char **argv) {
   rclcpp::init(argc, argv);
-  rclcpp::spin(std::make_shared<MinimalSubscriber>());
+
+  if (argc != 3) {
+      RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "usage: add_two_ints_client X Y");
+      return 1;
+  }
+
+  std::shared_ptr<rclcpp::Node> node = rclcpp::Node::make_shared("add_two_ints_client");
+
+  // ros service client created
+  rclcpp::Client<example_interfaces::srv::AddTwoInts>::SharedPtr client =
+    node->create_client<example_interfaces::srv::AddTwoInts>("add_two_ints");
+
+  // initialsing request message
+  auto request = std::make_shared<example_interfaces::srv::AddTwoInts::Request>();
+  request->a = atoll(argv[1]);
+  request->b = atoll(argv[2]);
+
+  while (!client->wait_for_service(1s)) {
+    if (!rclcpp::ok()) {
+      RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Interrupted while waiting for the service. Exiting.");
+      return 0;
+    }
+    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "service not available, waiting again...");
+  }
+
+  auto result = client->async_send_request(request);
+  // Wait for the result.
+  if (rclcpp::spin_until_future_complete(node, result) ==
+    rclcpp::FutureReturnCode::SUCCESS) {
+    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Sum: %ld", result.get()->sum);
+  } else {
+    RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Failed to call service add_two_ints");
+  }
+
   rclcpp::shutdown();
   return 0;
 }
