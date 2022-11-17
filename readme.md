@@ -61,3 +61,12 @@ colcon build --packages-select beginner_tutorials
  note: arg1 and arg2 are integer values
 
  This will change the default sum value from zero to arg1 + arg2 and thus the publishing message will also reflect this change.
+ 
+ ## Steps to launch both nodes
+
+ In a new terminal type
+ ```
+ cd <ROS2_ws>/
+ . install/setup.bash
+ ros2 launch beginner_tutorials pubsub.launch.yaml hz:=20.0
+ 
