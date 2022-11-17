@@ -53,6 +53,10 @@ size_t sum_;
  */
 class MinimalPublisher : public rclcpp::Node {
 public:
+  /**
+  * @brief Minimal Publisher Class constructor
+  * 
+  */
   MinimalPublisher() : Node("minimal_publisher") {
 
     RCLCPP_DEBUG_STREAM(this->get_logger(), "MinimalPublisher class created");
@@ -72,6 +76,10 @@ public:
   }
 
 private:
+  /**
+  * @brief timer call back to publish message
+  * 
+  */
   void timer_callback() {
     auto message = std_msgs::msg::String();
     message.data = std::to_string(sum_);
@@ -79,6 +87,10 @@ private:
     publisher_->publish(message);
   }
 
+  /**
+  * @brief Service callback
+  * 
+  */
   void add(const std::shared_ptr<example_interfaces::srv::AddTwoInts::Request> request,
         std::shared_ptr<example_interfaces::srv::AddTwoInts::Response> response)
   {
