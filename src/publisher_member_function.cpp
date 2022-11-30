@@ -42,6 +42,8 @@
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/string.hpp"
 #include "example_interfaces/srv/add_two_ints.hpp"
+#include "geometry_msgs/msg/transform_stamped.hpp"
+#include "tf2_ros/transform_broadcaster.h"
 
 using namespace std::chrono_literals;
 size_t sum_;
@@ -62,9 +64,9 @@ public:
     RCLCPP_DEBUG_STREAM(this->get_logger(), "MinimalPublisher class created");
     
     // initialize publisher
-    publisher_ = this->create_publisher<std_msgs::msg::String>("topic", 10);
+    publisher_ = this->create_publisher<std_msgs::msg::String>("chatter", 10);
 
-    frequency = this->get_parameter("hz").get_parameter_value().get<std::float_t>();
+    //frequency = this->get_parameter("hz").get_parameter_value().get<std::float_t>();
 
     // initialize timer callback
     timer_ = this->create_wall_timer(
@@ -75,6 +77,10 @@ public:
       std::bind(&MinimalPublisher::add, this, std::placeholders::_1, std::placeholders::_2);
     service_ = create_service<example_interfaces::srv::AddTwoInts>(
         "add_two_ints", serviceCallbackPtr);
+
+    tf_broadcaster_ = std::make_shared<tf2_ros::TransformBroadcaster>(this);
+    timer_ = this->create_wall_timer(
+        500ms, std::bind(&MinimalPublisher::timer_callback, this));
   }
 
 private:
@@ -87,6 +93,20 @@ private:
     message.data = std::to_string(sum_);
     RCLCPP_WARN_STREAM(this->get_logger(), "Publishing: " << message.data << "with frequency " << frequency);
     publisher_->publish(message);
+
+    geometry_msgs::msg::TransformStamped t;
+    t.header.stamp = this->get_clock()->now();
+    t.header.frame_id = "world";
+    t.child_frame_id = "talk";
+    t.transform.translation.x = 1.0;
+    t.transform.translation.y = 2.0;
+    t.transform.translation.z = 3.0;
+    t.transform.rotation.x = 1.0;
+    t.transform.rotation.y = 2.0;
+    t.transform.rotation.z = 3.0;
+    t.transform.rotation.w = 1.0;
+
+    tf_broadcaster_->sendTransform(t);
   }
 
   /**
@@ -112,6 +132,7 @@ private:
   rclcpp::TimerBase::SharedPtr timer_;
   rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_;
   rclcpp::Service<example_interfaces::srv::AddTwoInts>::SharedPtr service_;
+  std::shared_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
   size_t sum;
   float frequency;
 };

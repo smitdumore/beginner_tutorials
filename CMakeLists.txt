@@ -11,12 +11,14 @@ find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(example_interfaces REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
+find_package(tf2_ros REQUIRED)
+find_package(tf2 REQUIRED)
 
 add_executable(service src/service.cpp)
 ament_target_dependencies(service rclcpp std_msgs example_interfaces)
 
 add_executable(talker src/publisher_member_function.cpp)
-ament_target_dependencies(talker rclcpp std_msgs example_interfaces)
+ament_target_dependencies(talker rclcpp std_msgs tf2 tf2_ros example_interfaces)
 
 add_executable(listener src/subscriber_member_function.cpp)
 ament_target_dependencies(listener rclcpp std_msgs example_interfaces)
