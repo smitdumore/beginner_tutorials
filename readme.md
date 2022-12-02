@@ -68,7 +68,7 @@ colcon build --packages-select beginner_tutorials
  ```
  cd <ROS2_ws>/
  . install/setup.bash
- ros2 launch beginner_tutorials pubsub.launch.yaml hz:=20.0
+ ros2 launch beginner_tutorials pubsub.launch.yaml hz:=20.0 bool_record_bag:=true
  ```
 
  ## Steps to call service manually
@@ -78,4 +78,64 @@ colcon build --packages-select beginner_tutorials
  b:\ 10 
  ```
 
- 
+ ## inspecting transformation tf
+ # 1. Using view_frames
+ In a new terminal type
+ ```
+ ros2 run tf2_tools view_frames
+ ```
+ # 2. Using tf2 echo
+ In a new terminal type
+ ```
+ ros2 run tf2_ros tf2_echo world talk
+ ```
+
+ ## Working with bag files
+ # 1. Recording a bag file with all topics
+ In a new terminal type
+ ```
+ ros2 bag record -a -o my_bag 
+ ```
+ # disable recording by pressing Ctrl + c 
+
+ # 2. Inspecting bag file 
+ ```
+ ros2 bag info my_bag
+ ```
+
+ # 3. Playing bag files
+ ```
+ ros2 bag play my_bag
+ ```
+
+ # 4. Recording bag file with launch file
+ ```
+ ros2 launch beginner_tutorials pubsub.launch.yaml hz:=20.0 bool_record_bag:=true
+ ```
+
+ ## Playing back the bag file and Listener node
+ In a terminal run the bag file continously
+ ```
+ ros2 bag play my_bag --loop
+ ```
+ In a new terminal run the Listener
+ ```
+ ros2 run beginner_tutorials listener
+ ```
+
+ ## Running ROS test
+ # first complile the code
+ ```
+ colcon build --packages-select beginner_tutorials
+ ```
+
+ # run tests
+ ```
+ colcon test --event-handlers console_direct+ --packages-select beginner_tutorials
+ ```
+
+ # check return status
+ ```
+ colcon test-result --test-result-base build/beginner_tutorials
+ echo $?
+ ```
