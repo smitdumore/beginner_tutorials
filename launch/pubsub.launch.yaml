@@ -1,0 +1,28 @@
+launch:
+
+- arg:
+    name: "hz"
+    default: "10.0"
+- arg:
+    name: "bool_record_bag"
+    default: "false"
+
+# run the publisher node 
+- node:
+    pkg: "beginner_tutorials"
+    exec: "talker"
+    param:
+    -
+      name: "hz"
+      value: "$(var hz)"
+
+
+# run the publisher node
+- node:
+    pkg: "beginner_tutorials"
+    exec: "listener"
+  
+# bag record
+- executable:
+  cmd: "ros2 bag record -a -o my_bag"
+  if: $(var bool_record_bag)
