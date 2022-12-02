@@ -91,7 +91,8 @@ private:
   void timer_callback() {
     auto message = std_msgs::msg::String();
     message.data = std::to_string(sum_);
-    RCLCPP_WARN_STREAM(this->get_logger(), "Publishing: " << message.data << "with frequency " << frequency);
+    RCLCPP_WARN_STREAM(this->get_logger(), "Publishing: " 
+                      << message.data << "with frequency " << frequency);
     publisher_->publish(message);
 
     geometry_msgs::msg::TransformStamped t;
@@ -125,7 +126,8 @@ private:
 
     RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Incoming request\na: %ld" " b: %ld",
                 request->a, request->b);
-    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "sending back response: [%ld]", (long int)response->sum);
+    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), 
+                "sending back response: [%ld]", (long int)response->sum);
   }
 
   //members
